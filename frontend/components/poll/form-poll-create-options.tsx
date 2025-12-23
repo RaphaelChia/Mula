@@ -2,10 +2,12 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useCreatePoll } from '@/hooks/poll/useCreatePoll';
 import { useKeyBind } from '@/hooks/use-key-bind';
+import { PACKAGE_CONFIG } from '@/lib/package-config';
 import { cn } from '@/lib/utils';
 import { Plus, X } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 interface FormValues {
@@ -25,6 +27,8 @@ const FormPollCreateOptions = () => {
       options: [{ value: '' }, { value: '' }], // Start with 2 empty options
     },
   });
+  const { mutate, mutateAsync, isPending, isError, error, isSuccess, data } =
+    useCreatePoll();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -34,10 +38,22 @@ const FormPollCreateOptions = () => {
   // Refs to track input elements
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const onSubmit = (data: FormValues) => {
-    console.log('Form data:', data);
-    // Handle form submission here
-  };
+  const onSubmit = useCallback(
+    (data: FormValues) => {
+      mutateAsync({
+        name: data.title,
+        options: data.options.map((option) => option.value),
+        packageAddress: PACKAGE_CONFIG.testnet.pollPackage,
+      })
+        .then((result) => {
+          console.log('Transaction result:', result);
+        })
+        .catch((error) => {
+          console.error('Transaction error:', error);
+        });
+    },
+    [mutateAsync],
+  );
 
   // Handle Enter key: create new input and focus it
   useKeyBind({

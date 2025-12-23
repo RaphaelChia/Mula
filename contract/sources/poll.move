@@ -25,7 +25,7 @@ public struct Poll has key {
     ended: bool,
 }
 
-public fun create_poll(ctx: &mut TxContext, name: String, options: vector<String>) {
+public fun create_poll(name: String, options: vector<String>, ctx: &mut TxContext) {
     let mut votes_vector: vector<u64> = vector::empty();
     while (votes_vector.length() < options.length()) {
         votes_vector.push_back(0);
