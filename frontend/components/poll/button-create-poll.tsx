@@ -9,12 +9,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Plus } from 'lucide-react';
 
 const ButtonCreatePoll = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="">Create poll</Button>
+        <Button className="">
+          <span className="max-sm:hidden">Create poll</span>
+          <span className="flex items-center gap-1 sm:hidden">
+            <Plus className="size-4" />
+            Poll
+          </span>
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

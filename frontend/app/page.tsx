@@ -7,14 +7,14 @@ export default function Page() {
   return (
     <div className="mx-auto my-(--pagepy) flex w-7xl max-w-[calc(100%-2*var(--pagepx))] items-center justify-between">
       <div className="flex w-full items-center justify-between">
-        <ButtonCreatePoll />
-        <div className="flex w-xs items-center gap-2">
+        <div className="flex items-center gap-2 max-sm:w-[240px] sm:w-xs">
+          <Input placeholder="poll ID" className=""></Input>
           <Label className="shrink-0">
             <Search className="size-4" />
           </Label>
-          <Input placeholder="poll ID" className=""></Input>
         </div>
       </div>
+      <ButtonCreatePoll />
     </div>
   );
 }

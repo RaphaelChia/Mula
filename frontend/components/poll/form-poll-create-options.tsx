@@ -10,6 +10,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 
 interface FormValues {
   options: { value: string }[];
+  title: string;
 }
 
 const FormPollCreateOptions = () => {
@@ -20,6 +21,7 @@ const FormPollCreateOptions = () => {
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
+      title: '',
       options: [{ value: '' }, { value: '' }], // Start with 2 empty options
     },
   });
@@ -112,9 +114,19 @@ const FormPollCreateOptions = () => {
     <form
       id="poll-options-form"
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-4"
+      className="space-y-6"
     >
-      <div className="mb-4 flex items-center justify-between">
+      <div className="flex flex-col gap-2">
+        <label htmlFor="title" className="text-sm font-medium">
+          Poll Title
+        </label>
+        <Input
+          {...register('title')}
+          placeholder="e.g. What is your favorite color?"
+          className="w-full"
+        />
+      </div>
+      <div className="mb-2 flex items-center justify-between">
         <label className="text-sm font-medium">Poll Options</label>
         <Button
           type="button"
@@ -124,7 +136,7 @@ const FormPollCreateOptions = () => {
           className="gap-1.5"
         >
           <Plus className="size-4" />
-          Add Option
+          Option
         </Button>
       </div>
 
