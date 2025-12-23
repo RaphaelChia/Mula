@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useCreatePoll } from '@/hooks/poll/useCreatePoll';
+import { useCreatePollNew } from '@/hooks/poll/useCreatePoll';
 import { useKeyBind } from '@/hooks/use-key-bind';
 import { PACKAGE_CONFIG } from '@/lib/package-config';
 import { cn } from '@/lib/utils';
@@ -28,7 +28,7 @@ const FormPollCreateOptions = () => {
     },
   });
   const { mutate, mutateAsync, isPending, isError, error, isSuccess, data } =
-    useCreatePoll();
+    useCreatePollNew();
 
   const { fields, append, remove } = useFieldArray({
     control,
