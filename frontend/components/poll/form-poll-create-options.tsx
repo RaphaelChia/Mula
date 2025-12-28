@@ -4,18 +4,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCreatePollNew } from '@/hooks/poll/useCreatePoll';
 import { useKeyBind } from '@/hooks/use-key-bind';
+import { usePolls } from '@/lib/atoms/poll';
 import { PACKAGE_CONFIG } from '@/lib/package-config';
 import { cn } from '@/lib/utils';
 import { Plus, X } from 'lucide-react';
 import { useCallback, useEffect, useRef } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 interface FormValues {
   options: { value: string }[];
   title: string;
 }
 
-const FormPollCreateOptions = () => {
+interface CreateOptionsProps {
+  onSuccess?: () => void;
+  onFailure?: () => void;
+}
+
+const FormPollCreateOptions = ({
+  onSuccess,
+  onFailure,
+}: CreateOptionsProps) => {
+  const { setPolls } = usePolls();
   const {
     register,
     control,
@@ -46,10 +57,17 @@ const FormPollCreateOptions = () => {
         packageAddress: PACKAGE_CONFIG.testnet.pollPackage,
       })
         .then((result) => {
+          const objectId = result.objectId;
+          if (objectId) {
+            setPolls((prev) => [...prev, objectId]);
+          }
+          toast.success('Poll created successfully');
+          onSuccess?.();
           console.log('Transaction result:', result);
         })
         .catch((error) => {
           console.error('Transaction error:', error);
+          onFailure?.();
         });
     },
     [mutateAsync],

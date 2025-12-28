@@ -32,7 +32,9 @@ export const useCreatePoll = () => {
 
 /**
  * This is used over the function above due to the above always returning the non decoded effects and changes.
- * Sample return:
+ * Using SignAndExecute will use the wallet's execution function which doesnt take into account options.
+ * The Sign, then Execute will use the client's execution function which is created by mysten which properly takes into account options.
+ * Sample return txn after showChanges:
  * {
     "digest": "Hf9ABZkP7Av1Qp3UZ9JJtDxHD9FU1JMJBnwvWcqhHeGt",
     "effects": {
@@ -153,7 +155,7 @@ export const useCreatePollNew = () => {
       );
 
       console.log('Created Object ID:', createdObject?.objectId);
-      return result;
+      return { result, objectId: createdObject?.objectId };
     },
   });
 };
