@@ -1,4 +1,7 @@
+import { POLL_QUERY_KEYS } from '@/lib/query-keys';
+import { useSuiClient } from '@mysten/dapp-kit';
 import { SuiClient } from '@mysten/sui/client';
+import { useQuery } from '@tanstack/react-query';
 
 /**
  * Poll data structure returned from reading the object
@@ -9,6 +12,7 @@ export interface PollData {
   options: string[];
   votes: bigint[];
   creator: string;
+  createdAt: number;
   voters: string[];
   ended: boolean;
 }
@@ -16,7 +20,6 @@ export interface PollData {
 /**
  * Retrieves a poll object from the Sui blockchain using its Object ID.
  *
- * Note: In Sui, you need the Object ID (not transaction digest) to read objects.
  * The Object ID is a unique identifier for each object on-chain.
  *
  * @param client - The Sui client instance to use for the RPC call
@@ -62,13 +65,13 @@ export async function getPollById(
       creator: string;
       voters: string[];
       ended: boolean;
+      created_at: number;
     };
 
     // Convert votes to bigint array (they come as strings from JSON)
     const votes = fields.votes.map((vote) =>
       typeof vote === 'string' ? BigInt(vote) : vote,
     );
-
     // Extract the poll data
     return {
       id: objectId,
@@ -76,6 +79,7 @@ export async function getPollById(
       options: fields.options,
       votes,
       creator: fields.creator,
+      createdAt: fields.created_at,
       voters: fields.voters,
       ended: fields.ended,
     };
@@ -91,3 +95,16 @@ export async function getPollById(
     throw error;
   }
 }
+
+export const usePollById = (pollId: string) => {
+  const client = useSuiClient();
+  return useQuery({
+    queryKey: POLL_QUERY_KEYS.byId(pollId),
+    queryFn: () => {
+      if (!client) {
+        throw new Error('SuiClient not initialized');
+      }
+      return getPollById(client, pollId);
+    },
+  });
+};

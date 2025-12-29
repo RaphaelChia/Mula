@@ -66,6 +66,7 @@ const FormPollCreateOptions = ({
           console.log('Transaction result:', result);
         })
         .catch((error) => {
+          toast.error('Failed to create poll');
           console.error('Transaction error:', error);
           onFailure?.();
         });
