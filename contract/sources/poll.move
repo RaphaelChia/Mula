@@ -21,6 +21,7 @@ public struct Poll has key {
     name: String,
     votes: vector<u64>,
     creator: address,
+    created_at: u64,
     voters: vector<address>,
     ended: bool,
 }
@@ -36,6 +37,7 @@ public fun create_poll(name: String, options: vector<String>, ctx: &mut TxContex
         name: name,
         votes: votes_vector,
         creator: ctx.sender(),
+        created_at: ctx.epoch_timestamp_ms(),
         voters: vector::empty(),
         ended: false,
     };
