@@ -97,7 +97,7 @@ public fun test_end_poll() {
 fun init_test_with_poll(sender: address): (Poll::Poll, Scenario) {
     let mut scenario = ts::begin(sender);
     let poll_options = vector[b"Option 1".to_string(), b"Option 2".to_string()];
-    Poll::create_poll(scenario.ctx(), b"Test Poll".to_string(), poll_options);
+    Poll::create_poll(b"Test Poll".to_string(), poll_options, scenario.ctx());
     scenario.next_tx(@0xA11ce);
     (scenario.take_shared<Poll::Poll>(), scenario)
 }
