@@ -9,6 +9,7 @@ module mula::poll;
 module mula::Poll;
 
 use std::string::String;
+use sui::clock::{Self, timestamp_ms, Clock};
 
 const EOptionOutOfBounds: u64 = 1;
 const EPollEnded: u64 = 2;
@@ -26,7 +27,7 @@ public struct Poll has key {
     ended: bool,
 }
 
-public fun create_poll(name: String, options: vector<String>, ctx: &mut TxContext) {
+public fun create_poll(name: String, options: vector<String>, clock: &Clock, ctx: &mut TxContext) {
     let mut votes_vector: vector<u64> = vector::empty();
     while (votes_vector.length() < options.length()) {
         votes_vector.push_back(0);
@@ -37,7 +38,7 @@ public fun create_poll(name: String, options: vector<String>, ctx: &mut TxContex
         name: name,
         votes: votes_vector,
         creator: ctx.sender(),
-        created_at: ctx.epoch_timestamp_ms(),
+        created_at: clock::timestamp_ms(clock),
         voters: vector::empty(),
         ended: false,
     };

@@ -38,8 +38,7 @@ const FormPollCreateOptions = ({
       options: [{ value: '' }, { value: '' }], // Start with 2 empty options
     },
   });
-  const { mutate, mutateAsync, isPending, isError, error, isSuccess, data } =
-    useCreatePollNew();
+  const { mutateAsync } = useCreatePollNew();
 
   const { fields, append, remove } = useFieldArray({
     control,

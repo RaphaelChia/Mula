@@ -21,6 +21,7 @@ module mula::poll_tests;
 
 use mula::Poll;
 use std::unit_test;
+use sui::clock::{Self, Clock};
 use sui::test_scenario::{Self as ts, Scenario};
 
 #[test]
@@ -97,8 +98,11 @@ public fun test_end_poll() {
 fun init_test_with_poll(sender: address): (Poll::Poll, Scenario) {
     let mut scenario = ts::begin(sender);
     let poll_options = vector[b"Option 1".to_string(), b"Option 2".to_string()];
-    Poll::create_poll(b"Test Poll".to_string(), poll_options, scenario.ctx());
+
+    let clock = sui::clock::create_for_testing(scenario.ctx());
+    Poll::create_poll(b"Test Poll".to_string(), poll_options, &clock, scenario.ctx());
     scenario.next_tx(@0xA11ce);
+    unit_test::destroy(clock);
     (scenario.take_shared<Poll::Poll>(), scenario)
 }
 

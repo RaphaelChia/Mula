@@ -17,7 +17,7 @@ export const createPollTransaction = (
   const tx = new Transaction();
   const pollBuilder = createPoll({
     package: packageAddress,
-    arguments: { name, options },
+    arguments: { name, options, clock: '0x6' },
   });
   pollBuilder(tx);
   return tx;

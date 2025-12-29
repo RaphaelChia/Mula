@@ -1,7 +1,7 @@
 export const PACKAGE_CONFIG = {
   testnet: {
     pollPackage:
-      '0x8fad9104e9a99fc96db8d2cadf46ca0661b0a59c165be0955ba640e86f23e1d5',
+      '0xc902f58c764e283b421f7c07928bcce10e57724440263a4892514237d64ca9e8',
   },
 };
 
