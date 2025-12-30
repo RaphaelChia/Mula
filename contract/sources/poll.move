@@ -9,12 +9,16 @@ module mula::poll;
 module mula::Poll;
 
 use std::string::String;
-use sui::clock::{Self, timestamp_ms, Clock};
+use sui::clock::{Self, Clock};
 
-const EOptionOutOfBounds: u64 = 1;
-const EPollEnded: u64 = 2;
-const EVoterAlreadyVoted: u64 = 3;
-const ENotPollCreator: u64 = 4;
+#[error]
+const EOptionOutOfBounds: vector<u8> = b"OptionOutOfBounds";
+#[error]
+const EPollEnded: vector<u8> = b"PollEnded";
+#[error]
+const EVoterAlreadyVoted: vector<u8> = b"AlreadyVoted";
+#[error]
+const ENotPollCreator: vector<u8> = b"NotPollCreator";
 
 public struct Poll has key {
     id: UID,

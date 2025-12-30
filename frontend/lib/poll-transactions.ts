@@ -1,4 +1,3 @@
-import { createPoll, endPoll, vote } from '@/__generated__/mula/Poll';
 import { Transaction } from '@mysten/sui/transactions';
 
 /**
@@ -15,11 +14,16 @@ export const createPollTransaction = (
   packageAddress?: string,
 ): Transaction => {
   const tx = new Transaction();
-  const pollBuilder = createPoll({
-    package: packageAddress,
-    arguments: { name, options, clock: '0x6' },
+  tx.moveCall({
+    package: packageAddress ?? '@local-pkg/poll',
+    module: 'Poll',
+    function: 'create_poll',
+    arguments: [
+      tx.pure.string(name),
+      tx.pure.vector('string', options),
+      tx.object('0x6'),
+    ],
   });
-  pollBuilder(tx);
   return tx;
 };
 
@@ -37,11 +41,15 @@ export const voteTransaction = (
   packageAddress?: string,
 ): Transaction => {
   const tx = new Transaction();
-  const voteBuilder = vote({
-    package: packageAddress,
-    arguments: { poll: pollId, option },
+  // Pass the string directly - normalizeMoveArguments will convert it to tx.object()
+  // Ensure option is a bigint (u64) as expected by the contract
+  const optionValue = typeof option === 'bigint' ? option : BigInt(option);
+  tx.moveCall({
+    package: packageAddress ?? '@local-pkg/poll',
+    module: 'Poll',
+    function: 'vote',
+    arguments: [tx.object(pollId), tx.pure.u64(optionValue)],
   });
-  voteBuilder(tx);
   return tx;
 };
 
@@ -53,15 +61,15 @@ export const voteTransaction = (
  * @param packageAddress - Optional package address (defaults to '@local-pkg/poll')
  * @returns A Transaction object ready to be signed and executed
  */
-export const endPollTransaction = (
-  pollId: string,
-  packageAddress?: string,
-): Transaction => {
-  const tx = new Transaction();
-  const endPollBuilder = endPoll({
-    package: packageAddress,
-    arguments: { poll: pollId },
-  });
-  endPollBuilder(tx);
-  return tx;
-};
+// export const endPollTransaction = (
+//   pollId: string,
+//   packageAddress?: string,
+// ): Transaction => {
+//   const tx = new Transaction();
+//   const endPollBuilder = endPoll({
+//     package: packageAddress,
+//     arguments: { poll: pollId },
+//   });
+//   endPollBuilder(tx);
+//   return tx;
+// };

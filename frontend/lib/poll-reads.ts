@@ -15,6 +15,7 @@ export interface PollData {
   createdAt: number;
   voters: string[];
   ended: boolean;
+  packageAddress: string;
 }
 
 /**
@@ -55,7 +56,6 @@ export async function getPollById(
     if (!moveObject.type?.includes('Poll::Poll')) {
       return null;
     }
-
     // Extract fields from the parsed object
     const fields = moveObject.fields as {
       id: { id: string };
@@ -66,6 +66,7 @@ export async function getPollById(
       voters: string[];
       ended: boolean;
       created_at: number;
+      type: string;
     };
 
     // Convert votes to bigint array (they come as strings from JSON)
@@ -82,6 +83,7 @@ export async function getPollById(
       createdAt: fields.created_at,
       voters: fields.voters,
       ended: fields.ended,
+      packageAddress: moveObject.type,
     };
   } catch (error) {
     // If object doesn't exist, return null

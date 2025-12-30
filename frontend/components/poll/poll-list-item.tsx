@@ -1,22 +1,43 @@
 'use client';
 
 import { usePollById } from '@/lib/poll-reads';
-import { Calendar, Check, Circle, CircleSlash2, List } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useAccounts } from '@mysten/dapp-kit';
+import {
+  Calendar,
+  Check,
+  Circle,
+  CircleSlash2,
+  Crown,
+  List,
+} from 'lucide-react';
 import Link from 'next/link';
 
 interface PollListItemProps {
   pollId: string;
 }
 
-const BadgeInfo = ({ children }: { children: React.ReactNode }) => {
+const BadgeInfo = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
   return (
-    <div className="flex w-fit items-center gap-2 rounded-full border px-2 text-sm text-muted-foreground">
+    <div
+      className={cn(
+        'flex w-fit items-center gap-2 rounded-full border px-2 text-sm text-muted-foreground',
+        className,
+      )}
+    >
       {children}
     </div>
   );
 };
 
 const PollListItem = ({ pollId }: PollListItemProps) => {
+  const account = useAccounts()[0];
   const { data, isLoading, isError, error } = usePollById(pollId);
   if (isError) {
     return <div>Error: {error.message}</div>;
@@ -31,7 +52,14 @@ const PollListItem = ({ pollId }: PollListItemProps) => {
     <Link href={`/poll/${pollId}`}>
       <div className="flex cursor-pointer flex-col p-4 select-none hover:bg-muted">
         <div className="flex items-center gap-4">
-          <span className="w-0 flex-1 truncate">{data.name}</span>
+          <div className="flex w-full items-center gap-1.5">
+            {account && data.creator === account.address && (
+              <BadgeInfo className="w-fit border-none p-0">
+                <Crown className="size-4" />
+              </BadgeInfo>
+            )}
+            <span className="w-0 flex-1 truncate">{data.name}</span>
+          </div>
           <div className="flex shrink-0 items-center gap-2">
             <Calendar className="size-4" />
             <span className="max-sm:hidden">
@@ -58,6 +86,7 @@ const PollListItem = ({ pollId }: PollListItemProps) => {
           <BadgeInfo>
             {data.voters.length} <Check className="size-4" />
           </BadgeInfo>
+
           <BadgeInfo>
             {data.ended ? 'Ended' : 'Active'}{' '}
             {!data.ended && (
