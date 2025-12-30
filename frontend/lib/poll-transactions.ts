@@ -61,15 +61,16 @@ export const voteTransaction = (
  * @param packageAddress - Optional package address (defaults to '@local-pkg/poll')
  * @returns A Transaction object ready to be signed and executed
  */
-// export const endPollTransaction = (
-//   pollId: string,
-//   packageAddress?: string,
-// ): Transaction => {
-//   const tx = new Transaction();
-//   const endPollBuilder = endPoll({
-//     package: packageAddress,
-//     arguments: { poll: pollId },
-//   });
-//   endPollBuilder(tx);
-//   return tx;
-// };
+export const endPollTransaction = (
+  pollId: string,
+  packageAddress?: string,
+): Transaction => {
+  const tx = new Transaction();
+  tx.moveCall({
+    package: packageAddress ?? '@local-pkg/poll',
+    module: 'Poll',
+    function: 'end_poll',
+    arguments: [tx.object(pollId)],
+  });
+  return tx;
+};

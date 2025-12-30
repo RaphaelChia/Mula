@@ -5,13 +5,13 @@ import { toast } from 'sonner';
 const PollStats = ({ poll }: { poll: PollData }) => {
   const totalVotes = poll.votes.reduce((acc, curr) => acc + Number(curr), 0);
   return (
-    <div className="grid grid-cols-1 font-mono">
+    <div className="mb-[90px] grid grid-cols-1 font-mono">
       <div className="mb-4 font-sans text-2xl font-bold">
         <span className="font-bold">Poll Results</span>
       </div>
       <div className="">Total Votes: {totalVotes}</div>
       <div className="">
-        Ongoing since:
+        Created on:
         {new Date(Number(poll.createdAt)).toLocaleString('en-US', {
           year: 'numeric',
           month: 'short',
@@ -20,6 +20,7 @@ const PollStats = ({ poll }: { poll: PollData }) => {
           minute: '2-digit',
         })}
       </div>
+      <div>Status: {poll.ended ? 'Ended' : 'Ongoing'}</div>
       <hr className="my-4 w-[100px]"></hr>
       {totalVotes === 0 && (
         <div

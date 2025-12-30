@@ -2,7 +2,7 @@
 
 import { usePollById } from '@/lib/poll-reads';
 import { cn } from '@/lib/utils';
-import { useAccounts } from '@mysten/dapp-kit';
+import { useCurrentAccount } from '@mysten/dapp-kit';
 import {
   Calendar,
   Check,
@@ -37,7 +37,7 @@ const BadgeInfo = ({
 };
 
 const PollListItem = ({ pollId }: PollListItemProps) => {
-  const account = useAccounts()[0];
+  const account = useCurrentAccount();
   const { data, isLoading, isError, error } = usePollById(pollId);
   if (isError) {
     return <div>Error: {error.message}</div>;
