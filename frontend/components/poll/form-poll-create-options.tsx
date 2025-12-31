@@ -157,6 +157,7 @@ const FormPollCreateOptions = ({
           Poll Title
         </label>
         <Input
+          maxLength={50}
           {...register('title')}
           placeholder="e.g. What is your favorite color?"
           className="w-full"
@@ -182,12 +183,14 @@ const FormPollCreateOptions = ({
             `options.${index}.value` as const,
             {
               required: 'Option cannot be empty',
+              maxLength: 50,
             },
           );
 
           return (
             <div key={field.id} className="flex items-center gap-2">
               <Input
+                maxLength={50}
                 {...registerProps}
                 ref={(el) => {
                   inputRefs.current[index] = el;
