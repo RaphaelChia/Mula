@@ -47,7 +47,10 @@ const PollStats = ({ poll }: { poll: PollData }) => {
             key={index}
           >
             <span className="">
-              {option}: {poll.votes[index]}
+              {option}: {poll.votes[index]}{' '}
+              <span className="sm:hidden">
+                ({(Number(poll.votes[index]) / totalVotes) * 100}%)
+              </span>
             </span>
             <div className="relative col-span-5 flex items-center gap-1 max-sm:hidden">
               {Array.from(

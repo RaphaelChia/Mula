@@ -3,14 +3,7 @@
 import { usePollById } from '@/lib/poll-reads';
 import { cn } from '@/lib/utils';
 import { useCurrentAccount } from '@mysten/dapp-kit';
-import {
-  Calendar,
-  Check,
-  Circle,
-  CircleSlash2,
-  Crown,
-  List,
-} from 'lucide-react';
+import { Check, Circle, CircleSlash2, Clock, Crown, List } from 'lucide-react';
 import Link from 'next/link';
 
 interface PollListItemProps {
@@ -61,7 +54,7 @@ const PollListItem = ({ pollId }: PollListItemProps) => {
             <span className="w-0 flex-1 truncate">{data.name}</span>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <Calendar className="size-4" />
+            <Clock className="size-4" />
             <span className="max-sm:hidden">
               {new Date(Number(data.createdAt)).toLocaleString('en-US', {
                 year: 'numeric',

@@ -15,8 +15,10 @@ import { useEndPoll } from '@/hooks/poll/useEndPoll';
 import { useSubmitPollOptionNew } from '@/hooks/poll/useSubmitPollOption';
 import { usePolls } from '@/lib/atoms/poll';
 import { usePollById } from '@/lib/poll-reads';
+import { POLL_QUERY_KEYS } from '@/lib/query-keys';
 import { cn } from '@/lib/utils';
 import { useCurrentAccount } from '@mysten/dapp-kit';
+import { useQueryClient } from '@tanstack/react-query';
 import { Send } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -26,17 +28,22 @@ const PollOption = ({
   option,
   onClick,
   selected,
+  disabled,
 }: {
   option: string;
   onClick: () => void;
   selected: boolean;
+  disabled: boolean;
 }) => {
   return (
     <button
       onClick={onClick}
       className={cn(
-        'flex cursor-pointer items-center justify-center rounded-lg border-2 border-border p-4 text-center text-lg font-semibold transition-transform hover:scale-[102%] hover:border-foreground',
+        'flex cursor-pointer items-center justify-center rounded-lg border-2 border-border p-4 text-center text-lg font-semibold',
+        !disabled &&
+          'transition-transform hover:scale-[102%] hover:border-foreground',
         selected && 'bg-foreground text-background',
+        disabled && 'cursor-not-allowed opacity-50',
       )}
     >
       <span>{option}</span>
@@ -89,6 +96,7 @@ const Page = () => {
   const { slug } = useParams();
   const { data, isLoading, isError, error } = usePollById(slug as string);
   const { mutateAsync } = useSubmitPollOptionNew();
+  const queryClient = useQueryClient();
   const onsubmit = useCallback(() => {
     {
       if (!data) return;
@@ -102,6 +110,11 @@ const Page = () => {
       })
         .then(() => {
           toast.success('Poll submitted successfully');
+          setTimeout(() => {
+            queryClient.refetchQueries({
+              queryKey: POLL_QUERY_KEYS.byId(data.id),
+            });
+          }, 500);
         })
         .catch((error) => {
           toast.error('Failed to submit poll');
@@ -141,6 +154,9 @@ const Page = () => {
       <div className="mb-[90px] grid grid-cols-2 gap-4 max-sm:grid-cols-1">
         {data?.options.map((option, idx) => (
           <PollOption
+            disabled={
+              data.ended || data.voters.includes(account?.address ?? '')
+            }
             onClick={() => setSelectedOption(idx)}
             selected={selectedOption === idx}
             key={idx}
