@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import CopyButton from '@/components/utility/copy-button';
 import { useEndPoll } from '@/hooks/poll/useEndPoll';
 import { useSubmitPollOptionNew } from '@/hooks/poll/useSubmitPollOption';
 import { usePolls } from '@/lib/atoms/poll';
@@ -150,7 +151,10 @@ const Page = () => {
           Poll has Ended
         </span>
       )}
-      <span className="font-sans text-2xl font-bold">{data?.name} </span>
+      <span className="font-sans text-2xl font-bold">{data.name} </span>
+      <span className="flex items-center gap-2 font-mono">
+        Poll ID: {data.id} <CopyButton text={data.id} />
+      </span>
       <div className="mb-[90px] grid grid-cols-2 gap-4 max-sm:grid-cols-1">
         {data?.options.map((option, idx) => (
           <PollOption

@@ -77,7 +77,7 @@ const PollListItem = ({ pollId }: PollListItemProps) => {
   }
   return (
     <div className="group/poll-list-item flex">
-      <div className="flex w-0 items-center justify-center bg-destructive/30 transition-all group-hover/poll-list-item:w-16">
+      <div className="flex w-0 items-center justify-center bg-destructive/30 transition-all group-hover/poll-list-item:w-10">
         <RemovePollButton pollId={pollId} />
       </div>
       <Link href={`/poll/${pollId}`} className="w-full bg-background">
