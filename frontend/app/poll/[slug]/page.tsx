@@ -94,7 +94,7 @@ const EndPollButton = ({
                       queryKey: POLL_QUERY_KEYS.byId(pollId),
                     });
                     setOpen(false);
-                  }, 500);
+                  }, 1000);
                 })
                 .catch((error) => {
                   toast.error('Failed to end poll');
@@ -135,7 +135,7 @@ const Page = () => {
             queryClient.refetchQueries({
               queryKey: POLL_QUERY_KEYS.byId(data.id),
             });
-          }, 500);
+          }, 1000);
         })
         .catch((error) => {
           toast.error('Failed to submit poll');
