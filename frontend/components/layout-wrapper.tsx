@@ -7,7 +7,15 @@ import React from 'react';
 import { Toaster } from 'sonner';
 
 const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        staleTime: 5 * 60 * 1000, // 5 minutes
+      },
+    },
+  });
   return (
     <>
       <Theme appearance="light">
