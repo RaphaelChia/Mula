@@ -60,8 +60,10 @@ const EndPollButton = ({
   pollId: string;
 }) => {
   const { mutateAsync } = useEndPoll();
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           className="border border-border"
@@ -81,7 +83,25 @@ const EndPollButton = ({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="destructive" onClick={() => mutateAsync({ pollId })}>
+          <Button
+            variant="destructive"
+            onClick={() =>
+              mutateAsync({ pollId })
+                .then(() => {
+                  toast.success('Poll ended successfully');
+                  setTimeout(() => {
+                    queryClient.refetchQueries({
+                      queryKey: POLL_QUERY_KEYS.byId(pollId),
+                    });
+                    setOpen(false);
+                  }, 500);
+                })
+                .catch((error) => {
+                  toast.error('Failed to end poll');
+                  console.error('Transaction error:', error);
+                })
+            }
+          >
             End
           </Button>
         </DialogFooter>

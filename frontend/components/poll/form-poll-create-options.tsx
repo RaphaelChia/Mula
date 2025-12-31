@@ -56,10 +56,12 @@ const FormPollCreateOptions = ({
         packageAddress: PACKAGE_CONFIG.testnet.pollPackage,
       })
         .then((result) => {
-          const objectId = result.objectId;
-          if (objectId) {
-            setPolls((prev) => [...prev, objectId]);
-          }
+          setTimeout(() => {
+            const objectId = result.objectId;
+            if (objectId) {
+              setPolls((prev) => [...prev, objectId]);
+            }
+          }, 1000);
           toast.success('Poll created successfully');
           onSuccess?.();
           console.log('Transaction result:', result);
