@@ -66,7 +66,7 @@ const EndPollButton = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="border border-border"
+          className="border border-border bg-background"
           size="lg"
           variant="ghost"
           disabled={disabled}
@@ -111,13 +111,28 @@ const EndPollButton = ({
 };
 
 const Page = () => {
+  const account = useCurrentAccount();
+  const queryClient = useQueryClient();
   const [selectedOption, setSelectedOption] = useState<Number | null>(null);
   const { setPolls } = usePolls();
-  const account = useCurrentAccount();
   const { slug } = useParams();
   const { data, isLoading, isError, error } = usePollById(slug as string);
   const { mutateAsync } = useSubmitPollOptionNew();
-  const queryClient = useQueryClient();
+  const getSubmitButtonText = useCallback(() => {
+    //     selectedOption === null ||
+    // data.ended ||
+    // data.voters.includes(account?.address ?? '')
+    if (data?.voters.includes(account?.address ?? '')) {
+      return 'Already voted';
+    }
+    if (data?.ended) {
+      return 'Poll ended';
+    }
+    if (selectedOption === null) {
+      return 'Select an option';
+    }
+    return 'Submit';
+  }, [selectedOption, data, account]);
   const onsubmit = useCallback(() => {
     {
       if (!data) return;
@@ -206,7 +221,7 @@ const Page = () => {
           }
           onClick={onsubmit}
         >
-          Submit <Send className="size-4" />
+          {getSubmitButtonText()} <Send className="size-4" />
         </Button>
       </div>
     </div>
