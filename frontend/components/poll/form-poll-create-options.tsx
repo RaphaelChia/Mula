@@ -38,7 +38,7 @@ const FormPollCreateOptions = ({
       options: [{ value: '' }, { value: '' }], // Start with 2 empty options
     },
   });
-  const { mutateAsync } = useCreatePollNew();
+  const { mutateAsync, isPending, isSuccess } = useCreatePollNew();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -220,6 +220,15 @@ const FormPollCreateOptions = ({
           );
         })}
       </div>
+      <Button
+        className="w-full"
+        size="lg"
+        disabled={isPending || isSuccess}
+        type="submit"
+        form="poll-options-form"
+      >
+        Create
+      </Button>
     </form>
   );
 };

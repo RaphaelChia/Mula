@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -41,11 +40,6 @@ const ButtonCreatePoll = () => {
             setOpen(false);
           }}
         />
-        <DialogFooter>
-          <Button type="submit" form="poll-options-form">
-            Create
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

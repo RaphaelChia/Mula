@@ -1,5 +1,4 @@
 'use server';
-import clientConfig from '@/lib/env-config-client';
 import serverConfig from '@/lib/env-config-server';
 import { getMoveTarget } from '@/lib/helpers-onchain';
 import { EnokiClient, EnokiNetwork } from '@mysten/enoki';
@@ -18,9 +17,6 @@ export const getSponsoredTx = async ({
   txBytes: Uint8Array<ArrayBuffer>;
   sender: string;
 }) => {
-  console.log('enoki secret key', serverConfig.ENOKI_PRIVATE_KEY);
-  console.log('sui network name', clientConfig.NEXT_PUBLIC_SUI_NETWORK_NAME);
-  console.log('sender move target', getMoveTarget('Poll', 'vote'));
   const enokiClient = new EnokiClient({
     apiKey: serverConfig.ENOKI_PRIVATE_KEY,
   });

@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Item, ItemContent, ItemMedia, ItemTitle } from '@/components/ui/item';
 import CopyButton from '@/components/utility/copy-button';
 import { useEndPoll } from '@/hooks/poll/useEndPoll';
 import { useSubmitPollOptionNew } from '@/hooks/poll/useSubmitPollOption';
@@ -20,7 +21,7 @@ import { POLL_QUERY_KEYS } from '@/lib/query-keys';
 import { cn } from '@/lib/utils';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { useQueryClient } from '@tanstack/react-query';
-import { Send } from 'lucide-react';
+import { BadgeCheckIcon, Send } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -40,10 +41,12 @@ const PollOption = ({
     <button
       onClick={onClick}
       className={cn(
-        'flex cursor-pointer items-center justify-center rounded-lg border-2 border-border p-4 text-center text-lg font-semibold',
+        'flex cursor-pointer items-center justify-center rounded-lg border border-border p-4 text-center text-lg font-semibold shadow-xs',
         !disabled &&
           'transition-transform hover:scale-[102%] hover:border-foreground',
-        selected && 'bg-foreground text-background',
+        selected
+          ? 'bg-foreground text-background'
+          : 'bg-linear-to-t from-foreground/3 to-background',
         disabled && 'cursor-not-allowed opacity-50',
       )}
     >
@@ -59,7 +62,7 @@ const EndPollButton = ({
   disabled: boolean;
   pollId: string;
 }) => {
-  const { mutateAsync } = useEndPoll();
+  const { mutateAsync, isPending, isSuccess } = useEndPoll();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   return (
@@ -69,7 +72,7 @@ const EndPollButton = ({
           className="border border-border bg-background"
           size="lg"
           variant="ghost"
-          disabled={disabled}
+          disabled={disabled || isPending || isSuccess}
         >
           End
         </Button>
@@ -117,7 +120,7 @@ const Page = () => {
   const { setPolls } = usePolls();
   const { slug } = useParams();
   const { data, isLoading, isError, error } = usePollById(slug as string);
-  const { mutateAsync } = useSubmitPollOptionNew();
+  const { mutateAsync, isPending, isSuccess } = useSubmitPollOptionNew();
   const getSubmitButtonText = useCallback(() => {
     //     selectedOption === null ||
     // data.ended ||
@@ -190,6 +193,20 @@ const Page = () => {
       <span className="flex items-center gap-2 font-mono">
         Poll ID: {data.id} <CopyButton text={data.id} />
       </span>
+      {!data.ended &&
+      data.voters.includes(account?.address ?? '') &&
+      data.creator !== account?.address ? (
+        <Item variant="outline" size="sm" asChild>
+          <div>
+            <ItemMedia>
+              <BadgeCheckIcon className="size-5" />
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>Wait for the results!</ItemTitle>
+            </ItemContent>
+          </div>
+        </Item>
+      ) : null}
       <div className="mb-[90px] grid grid-cols-2 gap-4 max-sm:grid-cols-1">
         {data?.options.map((option, idx) => (
           <PollOption
@@ -217,7 +234,9 @@ const Page = () => {
           disabled={
             selectedOption === null ||
             data.ended ||
-            data.voters.includes(account?.address ?? '')
+            data.voters.includes(account?.address ?? '') ||
+            isPending ||
+            isSuccess
           }
           onClick={onsubmit}
         >
