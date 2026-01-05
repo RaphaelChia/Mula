@@ -1,5 +1,10 @@
-import { createPollTransaction } from '@/lib/poll-transactions';
 import {
+  executeSponsoredTx,
+  getSponsoredTx,
+} from '@/lib/enoki/get-sponsored-tx';
+import { createPollTransaction } from '@/lib/poll/poll-transactions';
+import {
+  useCurrentAccount,
   useSignAndExecuteTransaction,
   useSignTransaction,
   useSuiClient,
@@ -130,32 +135,49 @@ export const useCreatePoll = () => {
  */
 export const useCreatePollNew = () => {
   const client = useSuiClient();
+  const sender = useCurrentAccount();
   const { mutateAsync: signTransaction } = useSignTransaction();
   return useMutation({
     mutationFn: async (params: CreatePollParams) => {
       const { name, options, packageAddress } = params;
       console.log('received params', params);
+      if (!sender) {
+        throw new Error('Wallet not connected');
+      }
       const transaction = createPollTransaction(name, options, packageAddress);
-      const { bytes, signature } = await signTransaction({
-        transaction,
+      const txBytes = await transaction.build({
+        client: client,
+        onlyTransactionKind: true,
       });
-
-      const result = await client.executeTransactionBlock({
-        transactionBlock: bytes,
+      const sponsoredTxn = await getSponsoredTx({
+        sender: sender.address,
+        txBytes: txBytes,
+      });
+      const { signature } = await signTransaction({
+        transaction: sponsoredTxn.bytes,
+      });
+      const result = await executeSponsoredTx({
+        digest: sponsoredTxn.digest,
         signature: signature,
+      });
+      const waitedResultWithChanges = await client.waitForTransaction({
+        digest: result.digest,
         options: {
+          showObjectChanges: true,
           showEffects: true,
-          showObjectChanges: true, // This will now definitely work
         },
       });
 
       // 4. Parse the result
-      const createdObject = result.objectChanges?.find(
+      const createdObject = waitedResultWithChanges.objectChanges?.find(
         (change) => change.type === 'created',
       );
 
       console.log('Created Object ID:', createdObject?.objectId);
-      return { result, objectId: createdObject?.objectId };
+      return {
+        result: waitedResultWithChanges,
+        objectId: createdObject?.objectId,
+      };
     },
   });
 };

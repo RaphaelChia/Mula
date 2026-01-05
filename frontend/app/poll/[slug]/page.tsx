@@ -15,7 +15,7 @@ import CopyButton from '@/components/utility/copy-button';
 import { useEndPoll } from '@/hooks/poll/useEndPoll';
 import { useSubmitPollOptionNew } from '@/hooks/poll/useSubmitPollOption';
 import { usePolls } from '@/lib/atoms/poll';
-import { usePollById } from '@/lib/poll-reads';
+import { usePollById } from '@/lib/poll/poll-reads';
 import { POLL_QUERY_KEYS } from '@/lib/query-keys';
 import { cn } from '@/lib/utils';
 import { useCurrentAccount } from '@mysten/dapp-kit';

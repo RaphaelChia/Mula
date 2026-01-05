@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useCreatePollNew } from '@/hooks/poll/useCreatePoll';
 import { useKeyBind } from '@/hooks/use-key-bind';
 import { usePolls } from '@/lib/atoms/poll';
-import { PACKAGE_CONFIG } from '@/lib/package-config';
+import clientConfig from '@/lib/env-config-client';
 import { cn } from '@/lib/utils';
 import { Plus, X } from 'lucide-react';
 import { useCallback, useEffect, useRef } from 'react';
@@ -53,7 +53,7 @@ const FormPollCreateOptions = ({
       mutateAsync({
         name: data.title,
         options: data.options.map((option) => option.value),
-        packageAddress: PACKAGE_CONFIG.testnet.pollPackage,
+        packageAddress: clientConfig.NEXT_PUBLIC_POLL_PACKAGE_ADDRESS,
       })
         .then((result) => {
           setTimeout(() => {

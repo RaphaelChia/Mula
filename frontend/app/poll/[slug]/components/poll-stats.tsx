@@ -1,4 +1,4 @@
-import { PollData } from '@/lib/poll-reads';
+import { PollData } from '@/lib/poll/poll-reads';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 

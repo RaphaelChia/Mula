@@ -1,4 +1,5 @@
 'use client';
+import clientConfig from '@/lib/env-config-client';
 import { networkConfig } from '@/lib/network-config';
 import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
 import { Theme } from '@radix-ui/themes';
@@ -22,7 +23,10 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
         <Toaster />
 
         <QueryClientProvider client={queryClient}>
-          <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
+          <SuiClientProvider
+            networks={networkConfig}
+            defaultNetwork={clientConfig.NEXT_PUBLIC_SUI_NETWORK_NAME}
+          >
             <WalletProvider autoConnect>{children}</WalletProvider>
           </SuiClientProvider>
         </QueryClientProvider>

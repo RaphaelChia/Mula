@@ -1,5 +1,13 @@
-import { endPollTransaction } from '@/lib/poll-transactions';
-import { useSignTransaction, useSuiClient } from '@mysten/dapp-kit';
+import {
+  executeSponsoredTx,
+  getSponsoredTx,
+} from '@/lib/enoki/get-sponsored-tx';
+import { endPollTransaction } from '@/lib/poll/poll-transactions';
+import {
+  useCurrentAccount,
+  useSignTransaction,
+  useSuiClient,
+} from '@mysten/dapp-kit';
 import { useMutation } from '@tanstack/react-query';
 
 export interface EndPollParams {
@@ -9,11 +17,15 @@ export interface EndPollParams {
 
 export const useEndPoll = () => {
   const client = useSuiClient();
+  const sender = useCurrentAccount();
   const { mutateAsync: signTransaction } = useSignTransaction();
   return useMutation({
     mutationFn: async (params: EndPollParams) => {
       const { pollId, packageAddress } = params;
       console.log('received params', pollId);
+      if (!sender) {
+        throw new Error('Wallet not connected');
+      }
 
       let actualPackageAddress = packageAddress;
       if (!actualPackageAddress) {
@@ -32,25 +44,32 @@ export const useEndPoll = () => {
       }
 
       const transaction = endPollTransaction(pollId, actualPackageAddress);
-      const { bytes, signature } = await signTransaction({
-        transaction,
+      const txBytes = await transaction.build({
+        client: client,
+        onlyTransactionKind: true,
+      });
+      const sponsoredTxn = await getSponsoredTx({
+        sender: sender.address,
+        txBytes: txBytes,
+      });
+      const { signature } = await signTransaction({
+        transaction: sponsoredTxn.bytes,
       });
 
-      const result = await client.executeTransactionBlock({
-        transactionBlock: bytes,
+      const result = await executeSponsoredTx({
+        digest: sponsoredTxn.digest,
         signature: signature,
+      });
+      const waitedResultWithChanges = await client.waitForTransaction({
+        digest: result.digest,
         options: {
+          showObjectChanges: true,
           showEffects: true,
-          showObjectChanges: true, // This will now definitely work
         },
       });
-      console.log('result of ending poll', result);
       // 4. Parse the result
-      const createdObject = result.objectChanges?.find(
-        (change) => change.type === 'created',
-      );
 
-      return { result, objectId: createdObject?.objectId };
+      return { result: waitedResultWithChanges };
     },
   });
 };

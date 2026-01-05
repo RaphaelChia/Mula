@@ -1,5 +1,13 @@
-import { voteTransaction } from '@/lib/poll-transactions';
-import { useSignTransaction, useSuiClient } from '@mysten/dapp-kit';
+import {
+  executeSponsoredTx,
+  getSponsoredTx,
+} from '@/lib/enoki/get-sponsored-tx';
+import { voteTransaction } from '@/lib/poll/poll-transactions';
+import {
+  useCurrentAccount,
+  useSignTransaction,
+  useSuiClient,
+} from '@mysten/dapp-kit';
 import { useMutation } from '@tanstack/react-query';
 
 export interface SubmitPollOptionParams {
@@ -16,11 +24,15 @@ export interface SubmitPollOptionParams {
  */
 export const useSubmitPollOptionNew = () => {
   const client = useSuiClient();
+  const sender = useCurrentAccount();
   const { mutateAsync: signTransaction } = useSignTransaction();
   return useMutation({
     mutationFn: async (params: SubmitPollOptionParams) => {
       const { pollId, option, packageAddress } = params;
       console.log('received params', params);
+      if (!sender) {
+        throw new Error('Wallet not connected');
+      }
 
       // If packageAddress is not provided, fetch the object to extract it from its type
       let actualPackageAddress = packageAddress;
@@ -38,24 +50,43 @@ export const useSubmitPollOptionNew = () => {
           actualPackageAddress = typeParts[0] || undefined;
         }
       }
-
-      const transaction = voteTransaction(pollId, option, actualPackageAddress);
-
-      const { bytes, signature } = await signTransaction({
-        transaction,
+      const preparedTxn = voteTransaction(pollId, option, actualPackageAddress);
+      const txBytes = await preparedTxn.build({
+        client: client,
+        onlyTransactionKind: true,
+      });
+      const sponsoredTxn = await getSponsoredTx({
+        sender: sender.address,
+        txBytes: txBytes,
       });
 
-      const result = await client.executeTransactionBlock({
-        transactionBlock: bytes,
+      const { signature } = await signTransaction({
+        transaction: sponsoredTxn.bytes,
+      });
+      const result = await executeSponsoredTx({
+        digest: sponsoredTxn.digest,
         signature: signature,
+      });
+
+      const waitedResultWithChanges = await client.waitForTransaction({
+        digest: result.digest,
         options: {
+          showObjectChanges: true,
           showEffects: true,
-          showObjectChanges: true, // This will now definitely work
         },
       });
 
-      console.log('Vote transaction result:', result);
-      return { result };
+      // const result = await client.executeTransactionBlock({
+      //   transactionBlock: bytes,
+      //   signature: [signature, sponsoredTxn],
+      //   options: {
+      //     showEffects: true,
+      //     showObjectChanges: true, // This will now definitely work
+      //   },
+      // });
+
+      console.log('Vote transaction result:', waitedResultWithChanges);
+      return { result: waitedResultWithChanges };
     },
   });
 };

@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { usePolls } from '@/lib/atoms/poll';
-import { usePollById } from '@/lib/poll-reads';
+import { usePollById } from '@/lib/poll/poll-reads';
 import { cn } from '@/lib/utils';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import {
